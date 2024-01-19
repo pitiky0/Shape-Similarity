@@ -1,0 +1,36 @@
+# Virtual Environment
+venv/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local development settings
+.env
+
+# IDE settings
+.idea/
+.vscode/
+
+# Compiled Python files
+*.pyc
+
+# Compiled C extensions
+*.so
+
+# Dependency folders
+env/
+lib/
+lib64/
+bin/
+include/
+share/
+
+# Logs and databases
+*.log
+*.db
+
+# Environment variable file
+.env
+
