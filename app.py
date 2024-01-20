@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 
 # Specify the paths to your 3D Models and Thumbnails directories
-data_directory = "C:\\Users\\Ayoub\\Desktop\\CBIR\CBIR\\CBIR Data"
+data_directory = "CBIR Data"
 
 # Create an instance of ShapeSimilaritySearch
 shape_search = ShapeSimilaritySearch(data_directory)
@@ -23,13 +23,16 @@ def index():
 
 @app.route('/model/<model_name>')
 def show_model(model_name):
+    # Assuming shape_search is an instance of your ShapeSearch class
     selected_model = find_model_by_name(shape_search.models, model_name)
 
     if selected_model:
+        # Assuming shape_search is an instance of your ShapeSearch class
         similar_models = shape_search.shape_similarity_search(selected_model['mesh'])
         return render_template('show_model.html', selected_model=selected_model, similar_models=similar_models)
     else:
         abort(404, "Model not found")
+
 
 
 @app.route('/thumbnails/<filename>')

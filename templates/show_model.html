@@ -2,9 +2,94 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show Model</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            color: #333;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        li {
+            margin: 0 10px 20px;
+        }
+
+        img {
+            display: block;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 100%; /* Ensure images don't exceed container width */
+            transition: transform 0.2s ease-in-out;
+        }
+
+        img:hover {
+            transform: scale(1.05);
+        }
+
+        a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .similar-model {
+            margin-top: 10px;
+        }
+
+        .similar-model img {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .similar-model img:hover {
+            transform: scale(1.05);
+        }
+
+        .similar-model p {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
-<h1>hello {{ model['mesh'].metadata['file_name'] }}</h1>
+    <h1>{{ selected_model['mesh'].metadata['file_name'] }}</h1>
+    <img src="{{ url_for('thumbnail', filename=selected_model['mesh'].metadata['file_name']) }}" alt="{{ selected_model['mesh'].metadata['file_name'] }}" width="250" height="250">
+
+    <!-- Display information about the selected model -->
+
+    <h2>Similar Models</h2>
+    <ul>
+        {% for model, dissimilarity in similar_models %}
+            <li class="similar-model">
+                <img src="{{ url_for('thumbnail', filename=model['mesh'].metadata['file_name']) }}" alt="{{ model['mesh'].metadata['file_name'] }}" width="150" height="150">
+                <p>{{ model['mesh'].metadata['file_name'] }}</p>
+                <p>Dissimilarity: {{ dissimilarity }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="/">Back to Home</a>
 </body>
 </html>

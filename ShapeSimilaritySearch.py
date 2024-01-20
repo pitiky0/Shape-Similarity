@@ -1,12 +1,20 @@
 import numpy as np
 import os
-from MeshAnalyzer import MeshAnalyzer
-
+import pickle
+from MeshAnalyzer import ModelAnalyzer
 
 class ShapeSimilaritySearch:
-    def __init__(self, data_directory):
+    def __init__(self, data_directory, models_file="models.pkl"):
         self.data_directory = data_directory
-        self.load_models()
+        self.models_file = models_file
+        self.models = []
+
+        # Load models from file if available, otherwise load them and save
+        if os.path.exists(models_file):
+            self.load_models_from_file()
+        else:
+            self.load_models()
+            self.save_models_to_file()
 
     def load_models(self):
         self.models = []
@@ -24,42 +32,55 @@ class ShapeSimilaritySearch:
                                                       f"{os.path.splitext(file_name)[0]}.png")
 
                         # Use MeshAnalyzer to load and analyze 3D models
-                        mesh_analyzer = MeshAnalyzer(model_path)
-                        inertial_moments, average_distances, variances = mesh_analyzer.analyze_along_principal_axis()
+                        mesh_analyzer = ModelAnalyzer(model_path)
+                        inertial_moments = mesh_analyzer.moments_along_first_axis()
+                        average_distances = mesh_analyzer.mean_distance_to_first_axis()
+                        variances = mesh_analyzer.variance_of_distance_to_first_axis()
 
                         # Append model information to the list
-                        self.models.append({'mesh': mesh_analyzer.mesh, 'thumbnail_path': thumbnail_path,
+                        self.models.append({'mesh': mesh_analyzer.model, 'thumbnail_path': thumbnail_path,
                                             'inertial_moments': inertial_moments,
                                             'average_distances': average_distances,
                                             'variances': variances})
 
-    def calculate_feature_vector(self, model):
-        # Implement your feature vector calculation using the analyzed statistics
-        # This could include moments of inertia, average distance, variance, etc.
-        feature_vector = np.concatenate([model['inertial_moments'], model['average_distances'], model['variances']])
-        return feature_vector
+    def load_models_from_file(self):
+        with open(self.models_file, "rb") as file:
+            self.models = pickle.load(file)
+
+    def save_models_to_file(self):
+        with open(self.models_file, "wb") as file:
+            pickle.dump(self.models, file)
+
+    def calculate_feature_vector(self, target_mesh):
+        # Use vectorized operations for improved performance
+        inertial_moments = target_mesh['inertial_moments']
+        average_distances = target_mesh['average_distances']
+        variances = target_mesh['variances']
+        return np.array([inertial_moments, average_distances, variances])
 
     def compute_dissimilarity(self, vector1, vector2):
-        # Implement your dissimilarity computation here
-        # This could include Euclidean distance, elastic matching, etc.
+        # Use NumPy for vectorized operations
         return np.linalg.norm(vector1 - vector2)
 
     def shape_similarity_search(self, query_model, k=20):
         query_feature_vector = self.calculate_feature_vector(query_model)
         distances = []
 
-        for model in self.models:
-            model_feature_vector = self.calculate_feature_vector(model)
+        for target_mesh in self.models:
+            model_feature_vector = self.calculate_feature_vector(target_mesh)
             dissimilarity = self.compute_dissimilarity(query_feature_vector, model_feature_vector)
-            distances.append((model, dissimilarity))
+
+            # Format dissimilarity to a string with five decimal places
+            formatted_dissimilarity = "{:.5f}".format(dissimilarity)
+            distances.append((target_mesh, formatted_dissimilarity))
 
         distances.sort(key=lambda x: x[1])
         return distances[:k]
 
-# Example usage
+# Example Usage:
 if __name__ == "__main__":
     # Specify the paths to your 3D Models and Thumbnails directories
-    data_directory = "C:\\Users\\Ayoub\\Desktop\\CBIR\CBIR\\CBIR Data"
+    data_directory = "CBIR Data"
 
     shape_search = ShapeSimilaritySearch(data_directory)
     query_model_index = 0  # Index of the model to use as a query

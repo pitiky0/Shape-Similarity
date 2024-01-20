@@ -6,52 +6,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Models Gallery</title>
     <style>
+        * {
+          box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 20px;
+          font-family: Arial, Helvetica, sans-serif;
+          margin: 0;
+          padding: 0;
         }
 
         h1 {
-            color: #333;
+          text-align: center;
         }
 
-        ul {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
+        /* Flex container for responsive layout */
+        .row {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          margin: 0 -10px;
         }
 
-        li {
-            margin-right: 20px;
-            margin-bottom: 20px;
+        /* Responsive column */
+        .column {
+          flex: 25%;
+          max-width: 25%;
+          padding: 10px;
+          box-sizing: border-box;
         }
 
-        img {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 100%; /* Ensure images don't exceed container width */
+        /* Style the counter cards */
+        .card {
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+          padding: 16px;
+          text-align: center;
+          background-color: #f1f1f1;
         }
 
-        a {
-            color: #007BFF;
-            text-decoration: none;
-            font-weight: bold;
-            margin-top: 10px;
-            display: block;
+        /* Responsive image */
+        .card img {
+          max-width: 100%;
+          height: auto;
+        }
+
+        /* Style the button */
+        .card_btn {
+          display: inline-block;
+          padding: 8px 16px;
+          text-align: center;
+          text-decoration: none;
+          font-size: 14px;
+          cursor: pointer;
+          background-color: #007BFF;
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+        }
+
+        .card_btn:hover {
+          background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <h1>3D Models Gallery</h1>
-    <ul>
+
+    <div class="row">
         {% for model in models %}
-            <li>
-                <img src="{{ url_for('thumbnail', filename=model['mesh'].metadata['file_name']) }}" alt="{{ model['mesh'].metadata['file_name'] }}" width="150" height="150">
-                <a href="{{ url_for('show_model', model_name=model['mesh'].metadata['file_name']) }}">{{ model['mesh'].metadata['file_name'] }}</a>
-            </li>
+          <div class="column">
+            <div class="card">
+                <img src="{{ url_for('thumbnail', filename=model['mesh'].metadata['file_name']) }}" alt="{{ model['mesh'].metadata['file_name'] }}">
+                <h3>{{ model['mesh'].metadata['file_name'] }}</h3>
+                <a href="{{ url_for('show_model', model_name=model['mesh'].metadata['file_name']) }}" class="card_btn">Find Similar</a>
+            </div>
+          </div>
         {% endfor %}
-    </ul>
+    </div>
 </body>
 </html>

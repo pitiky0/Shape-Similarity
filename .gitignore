@@ -11,7 +11,7 @@ __pycache__/
 
 # IDE settings
 .idea/
-.idea
+.pkl
 .vscode/
 
 # Compiled Python files
